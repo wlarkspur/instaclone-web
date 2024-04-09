@@ -1,17 +1,17 @@
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-  Redirect,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Home from "./screens/Home";
 import Login from "./screens/Login";
 import NotFound from "./screens/NotFound";
+import { useReactiveVar } from "@apollo/client";
+import { darkModeVar, isLoggedInVar } from "./apollo";
+import { ThemeProvider } from "styled-components";
+import { GlobalStyles, darkTheme, lightTheme } from "./styles";
 
 function App() {
-  const isLoggedIn = true;
+  const isLoggedIn = useReactiveVar(isLoggedInVar);
+  const darkMode = useReactiveVar(darkModeVar);
   return (
-    <div>
+    <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
       <Router>
         <Switch>
           <Route path="/" exact>
@@ -22,7 +22,8 @@ function App() {
           </Route>
         </Switch>
       </Router>
-    </div>
+      <GlobalStyles />
+    </ThemeProvider>
   );
 }
 
