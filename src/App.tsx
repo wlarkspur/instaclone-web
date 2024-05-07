@@ -6,6 +6,7 @@ import { useReactiveVar } from "@apollo/client";
 import { darkModeVar, isLoggedInVar } from "./apollo";
 import { ThemeProvider, styled } from "styled-components";
 import { GlobalStyles, darkTheme, lightTheme } from "./styles";
+import SignUp from "./screens/SignUp";
 
 interface IContainerProps {
   floating: boolean;
@@ -27,6 +28,11 @@ function App() {
           <Route path="/" exact>
             {isLoggedIn ? <Home /> : <Login />}
           </Route>
+          {!isLoggedIn ? (
+            <Route path="/sign-up">
+              <SignUp />
+            </Route>
+          ) : null}
           <Route>
             <NotFound />
           </Route>
