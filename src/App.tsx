@@ -7,16 +7,11 @@ import { darkModeVar, isLoggedInVar } from "./apollo";
 import { ThemeProvider, styled } from "styled-components";
 import { GlobalStyles, darkTheme, lightTheme } from "./styles";
 import SignUp from "./screens/SignUp";
+import routes from "./screens/routes";
 
 interface IContainerProps {
   floating: boolean;
 }
-
-const Container = styled.div<IContainerProps>`
-  background-color: ${(props) => props.theme.bgColor};
-  color: ${(props) => props.theme.fontColor};
-  box-shadow: ${(props) => (props.floating ? "" : "")};
-`;
 
 function App() {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
@@ -25,11 +20,11 @@ function App() {
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
       <Router>
         <Switch>
-          <Route path="/" exact>
+          <Route path={routes.home} exact>
             {isLoggedIn ? <Home /> : <Login />}
           </Route>
           {!isLoggedIn ? (
-            <Route path="/sign-up">
+            <Route path={routes.signUp}>
               <SignUp />
             </Route>
           ) : null}
