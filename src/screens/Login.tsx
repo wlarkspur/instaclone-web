@@ -1,21 +1,18 @@
 import {
-  faFacebook,
-  faFacebookF,
   faFacebookSquare,
   faInstagram,
 } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
 import styled from "styled-components";
-
 import AuthLayout from "../components/auth/AuthLayout";
-
 import Button from "../components/auth/Button";
 import Separator from "../components/auth/Separator";
 import Input from "../components/auth/Input";
 import FormBox from "../components/auth/FormBox";
 import BottomBox from "../components/auth/BottomBox";
 import routes from "./routes";
+import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 
 const FacebookLogin = styled.div`
   color: #385285;
@@ -26,8 +23,26 @@ const FacebookLogin = styled.div`
 `;
 
 function Login() {
+  const [username, setUsername] = useState("");
+  const [usernameError, setUsernameError] = useState("");
+  const onUsernameChange = (e: any) => {
+    setUsernameError("");
+    setUsername(e.target.value);
+  };
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    if (username === "") {
+      setUsernameError("not empty plz");
+    }
+    if (username.length < 10) {
+      setUsernameError("Too short");
+    }
+  };
   return (
     <AuthLayout>
+      <Helmet>
+        <title>Log in | InstaClone</title>
+      </Helmet>
       <FormBox>
         <div>
           <FontAwesomeIcon icon={faInstagram} size="3x" />

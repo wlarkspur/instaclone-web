@@ -12,6 +12,7 @@ import BottomBox from "../components/auth/BottomBox";
 import routes from "./routes";
 import { styled } from "styled-components";
 import { FatLink } from "../components/shared";
+import { Helmet } from "react-helmet-async";
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -28,6 +29,9 @@ const Subtitle = styled(FatLink)`
 function SignUp() {
   return (
     <AuthLayout>
+      <Helmet>
+        <title>Sign up | Instaclone</title>
+      </Helmet>
       <FormBox>
         <HeaderContainer>
           <FontAwesomeIcon icon={faInstagram} size="3x" />
