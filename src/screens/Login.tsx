@@ -11,8 +11,8 @@ import Input from "../components/auth/Input";
 import FormBox from "../components/auth/FormBox";
 import BottomBox from "../components/auth/BottomBox";
 import routes from "./routes";
-import { useState } from "react";
 import { Helmet } from "react-helmet-async";
+import { useForm } from "react-hook-form";
 
 const FacebookLogin = styled.div`
   color: #385285;
@@ -23,20 +23,12 @@ const FacebookLogin = styled.div`
 `;
 
 function Login() {
-  const [username, setUsername] = useState("");
-  const [usernameError, setUsernameError] = useState("");
-  const onUsernameChange = (e: any) => {
-    setUsernameError("");
-    setUsername(e.target.value);
+  const { register, watch, handleSubmit } = useForm();
+  const onValid = (data: any) => {
+    console.log(data, "valid");
   };
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    if (username === "") {
-      setUsernameError("not empty plz");
-    }
-    if (username.length < 10) {
-      setUsernameError("Too short");
-    }
+  const onInvalid = (data: any) => {
+    console.log(data, "Invalid");
   };
   return (
     <AuthLayout>
@@ -47,9 +39,20 @@ function Login() {
         <div>
           <FontAwesomeIcon icon={faInstagram} size="3x" />
         </div>
-        <form>
-          <Input type="text" placeholder="Username" />
-          <Input type="password" placeholder="Password" />
+        <form onSubmit={handleSubmit(onValid, onInvalid)}>
+          <Input
+            {...register("username", {
+              required: "Username is required",
+              minLength: 5,
+            })}
+            type="text"
+            placeholder="Username"
+          />
+          <Input
+            {...register("password", { required: "Password is required" })}
+            type="password"
+            placeholder="Password"
+          />
           <Button type="submit" value="Log in" />
         </form>
         <Separator />
