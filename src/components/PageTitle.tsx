@@ -3,7 +3,11 @@ interface PageTitleProps {
   title: string;
 }
 function PageTitle({ title }: PageTitleProps) {
-  return <Helmet>{title} | Instaclone</Helmet>;
+  return (
+    <Helmet>
+      <title>{title} | Instaclone</title>
+    </Helmet>
+  );
 }
 
 export default PageTitle;

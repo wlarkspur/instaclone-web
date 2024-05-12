@@ -13,6 +13,9 @@ import BottomBox from "../components/auth/BottomBox";
 import routes from "./routes";
 import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
+import FormError from "../components/auth/FromError";
+import { gql, useMutation } from "@apollo/client";
+import { logUserIn } from "../apollo";
 
 const FacebookLogin = styled.div`
   color: #385285;
@@ -21,14 +24,59 @@ const FacebookLogin = styled.div`
     font-weight: 600;
   }
 `;
-
+interface LoginFormInputs {
+  username: string;
+  password: string;
+  result?: string;
+}
+const LOGIN_MUTATION = gql`
+  mutation login($username: String!, $password: String!) {
+    login(username: $username, password: $password) {
+      ok
+      token
+      error
+    }
+  }
+`;
 function Login() {
-  const { register, watch, handleSubmit } = useForm();
-  const onValid = (data: any) => {
-    console.log(data, "valid");
+  const {
+    register,
+    handleSubmit,
+    formState,
+    getValues,
+    setError,
+    clearErrors,
+  } = useForm<LoginFormInputs>({
+    mode: "onChange",
+  });
+  const onCompleted = (data: any) => {
+    const {
+      login: { ok, error, token },
+    } = data;
+    if (!ok) {
+      setError("result", { message: error });
+    }
+    if (token) {
+      logUserIn(token);
+    }
   };
-  const onInvalid = (data: any) => {
-    console.log(data, "Invalid");
+  const [login, { loading }] = useMutation(LOGIN_MUTATION, {
+    onCompleted,
+  });
+  const onValid = (data: any) => {
+    if (loading) {
+      return;
+    }
+    const { username, password } = getValues();
+    login({
+      variables: {
+        username,
+        password,
+      },
+    });
+  };
+  const clearLoginError = () => {
+    clearErrors("result");
   };
   return (
     <AuthLayout>
@@ -39,21 +87,35 @@ function Login() {
         <div>
           <FontAwesomeIcon icon={faInstagram} size="3x" />
         </div>
-        <form onSubmit={handleSubmit(onValid, onInvalid)}>
+        <form onSubmit={handleSubmit(onValid)}>
           <Input
             {...register("username", {
               required: "Username is required",
-              minLength: 5,
+              minLength: {
+                value: 3,
+                message: "Username should be longer than 3 chars.",
+              },
             })}
+            onFocus={clearLoginError}
             type="text"
             placeholder="Username"
+            hasError={Boolean(formState.errors.username?.message)}
           />
+          <FormError message={formState.errors.username?.message} />
           <Input
             {...register("password", { required: "Password is required" })}
+            onFocus={clearLoginError}
             type="password"
             placeholder="Password"
+            hasError={Boolean(formState.errors.password?.message)}
           />
-          <Button type="submit" value="Log in" />
+          <FormError message={formState.errors.password?.message} />
+          <Button
+            type="submit"
+            value={loading ? "loading..." : "Log In"}
+            disabled={!formState.isValid || loading}
+          />
+          <FormError message={formState.errors.result?.message} />
         </form>
         <Separator />
         <FacebookLogin>
