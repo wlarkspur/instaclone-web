@@ -7,7 +7,11 @@ const SBottomBox = styled(BaseBox)`
   a {
     font-weight: 600;
     margin-left: 5px;
-    color: ${(props) => props.theme.accent};
+    color: #385285;
+    text-decoration: none;
+    &:visited {
+      color: ${(props) => props.theme.accentColor};
+    }
   }
 `;
 

@@ -4,7 +4,7 @@ const Button = styled.input`
   border: none;
   border-radius: 3px;
   margin-top: 12px;
-  background-color: ${(props) => props.theme.accent};
+  background-color: ${(props) => props.theme.accentColor};
   color: white;
   text-align: center;
   padding: 8px 0px;

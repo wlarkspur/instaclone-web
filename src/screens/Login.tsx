@@ -16,6 +16,7 @@ import { useForm } from "react-hook-form";
 import FormError from "../components/auth/FromError";
 import { gql, useMutation } from "@apollo/client";
 import { logUserIn } from "../apollo";
+import { useLocation } from "react-router-dom";
 
 const FacebookLogin = styled.div`
   color: #385285;
@@ -29,6 +30,17 @@ interface LoginFormInputs {
   password: string;
   result?: string;
 }
+interface ILocation {
+  message?: string;
+  username: string;
+  password: string;
+}
+
+const Notification = styled.div`
+  color: #2ecc71;
+  padding-top: 20px;
+  font-weight: 600;
+`;
 const LOGIN_MUTATION = gql`
   mutation login($username: String!, $password: String!) {
     login(username: $username, password: $password) {
@@ -39,6 +51,7 @@ const LOGIN_MUTATION = gql`
   }
 `;
 function Login() {
+  const location = useLocation<ILocation>();
   const {
     register,
     handleSubmit,
@@ -48,6 +61,10 @@ function Login() {
     clearErrors,
   } = useForm<LoginFormInputs>({
     mode: "onChange",
+    defaultValues: {
+      username: location?.state?.username || "",
+      password: location?.state?.password || "",
+    },
   });
   const onCompleted = (data: any) => {
     const {
@@ -87,6 +104,7 @@ function Login() {
         <div>
           <FontAwesomeIcon icon={faInstagram} size="3x" />
         </div>
+        <Notification>{location?.state?.message}</Notification>
         <form onSubmit={handleSubmit(onValid)}>
           <Input
             {...register("username", {
@@ -124,7 +142,7 @@ function Login() {
         </FacebookLogin>
       </FormBox>
       <BottomBox
-        cta="Don't have an account? Sign up"
+        cta="Don't have an account?"
         link={routes.signUp}
         linkText="Sign up"
       />

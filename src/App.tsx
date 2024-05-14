@@ -10,10 +10,6 @@ import SignUp from "./screens/SignUp";
 import routes from "./screens/routes";
 import { HelmetProvider } from "react-helmet-async";
 
-interface IContainerProps {
-  floating: boolean;
-}
-
 function App() {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
   const darkMode = useReactiveVar(darkModeVar);
@@ -21,6 +17,7 @@ function App() {
     <ApolloProvider client={client}>
       <HelmetProvider>
         <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
+          <GlobalStyles />
           <Router>
             <Switch>
               <Route path={routes.home} exact>
@@ -36,7 +33,6 @@ function App() {
               </Route>
             </Switch>
           </Router>
-          <GlobalStyles />
         </ThemeProvider>
       </HelmetProvider>
     </ApolloProvider>
