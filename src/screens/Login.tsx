@@ -94,6 +94,8 @@ function Login() {
   };
   const clearLoginError = () => {
     clearErrors("result");
+    clearErrors("username");
+    clearErrors("password");
   };
   return (
     <AuthLayout>
