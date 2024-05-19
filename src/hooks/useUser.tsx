@@ -7,6 +7,7 @@ import routes from "../screens/routes";
 const ME_QUERY = gql`
   query me {
     me {
+      id
       username
       avatar
     }
@@ -18,7 +19,7 @@ function useUser() {
   const { data } = useQuery(ME_QUERY, {
     skip: !hasToken, // 사용자가 LocalStorage를 통해 로그인한 경우에만 실행
   });
-  console.log(data);
+
   useEffect(() => {
     if (data?.me === null) {
       logUserOut();
