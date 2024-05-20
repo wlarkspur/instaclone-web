@@ -11,6 +11,7 @@ import {
 import { faHeart as SolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { gql, useMutation } from "@apollo/client";
+import Comments from "./Comments";
 
 const TOGGLE_LIKE_MUTATION = gql`
   mutation toggleLike($id: Int!) {
@@ -71,7 +72,7 @@ const Likes = styled(FatText)`
   display: block;
 `;
 
-interface IFeedPhoto {
+export interface IFeedPhoto {
   id: number;
   user: {
     avatar: string;
@@ -80,9 +81,32 @@ interface IFeedPhoto {
   file: string;
   isLiked: boolean;
   likes: number;
+  caption: string;
+  commentNumber: number;
+  comments: [
+    {
+      id: number;
+      user: {
+        username: string;
+        avatar: string;
+      };
+      payload: string;
+      isMine: boolean;
+      createdAt: string;
+    }
+  ];
 }
 
-function Photo({ id, user, file, isLiked, likes }: IFeedPhoto) {
+function Photo({
+  id,
+  user,
+  file,
+  isLiked,
+  likes,
+  caption,
+  commentNumber,
+  comments,
+}: IFeedPhoto) {
   const updateToggleLike = (cache: any, result: any) => {
     const {
       data: {
@@ -151,19 +175,39 @@ function Photo({ id, user, file, isLiked, likes }: IFeedPhoto) {
         <Likes>
           {likes === 1 ? "1 like" : likes === 0 ? "0 like" : `${likes} likes`}
         </Likes>
+        <Comments
+          author={user}
+          caption={caption}
+          commentNumber={commentNumber}
+          comments={comments}
+        />
       </PhotoData>
     </PhotoContainer>
   );
 }
 
-Photo.propTypes = {
+/* Photo.propTypes = {
   id: PropTypes.number.isRequired,
   user: PropTypes.shape({
     avatar: PropTypes.string,
     username: PropTypes.string.isRequired,
   }),
+  caption: PropTypes.string,
   file: PropTypes.string.isRequired,
   isLiked: PropTypes.bool.isRequired,
   likes: PropTypes.number.isRequired,
-};
+  commentNumber: PropTypes.number.isRequired,
+  comments: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      user: PropTypes.shape({
+        avatar: PropTypes.string,
+        username: PropTypes.string.isRequired,
+      }),
+      payload: PropTypes.string.isRequired,
+      isMine: PropTypes.bool.isRequired,
+      createdAt: PropTypes.string.isRequired,
+    })
+  ),
+}; */
 export default Photo;
