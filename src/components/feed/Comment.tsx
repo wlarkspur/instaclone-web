@@ -40,7 +40,7 @@ function Comment({ id, author, payload, children }: IComment) {
               </Link>
             </React.Fragment>
           ) : (
-            <React.Fragment key={index}>{word}</React.Fragment>
+            <React.Fragment key={index}>{word} </React.Fragment>
           )
         )}
       </CommentCaption>

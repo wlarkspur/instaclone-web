@@ -114,8 +114,23 @@ function Photo({
       },
     } = result;
     if (ok) {
+      const photoId = `Photo:${id}`;
+      cache.modify({
+        id: photoId,
+        fields: {
+          isLiked(prev: any) {
+            return !prev;
+          },
+          likes(prev: any) {
+            if (isLiked) {
+              return prev - 1;
+            }
+            return prev + 1;
+          },
+        },
+      });
       //read,writeFragment를 사용하면 Cache선에서 데이터 처리가 가능하여 웹사이트의 속도가 빨라지는 이점을 얻을 수 있다.
-      const fragmentId = `Photo:${id}`;
+      /* const fragmentId = `Photo:${id}`;
       const fragment = gql`
         fragment BSName on Photo {
           isLiked
@@ -136,7 +151,7 @@ function Photo({
             likes: cacheIsLiked ? cacheLikees - 1 : cacheLikees + 1,
           },
         });
-      }
+      } */
     }
   };
   const [toggleLikeMutation, { loading }] = useMutation(TOGGLE_LIKE_MUTATION, {
