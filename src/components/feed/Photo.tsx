@@ -191,6 +191,7 @@ function Photo({
           {likes === 1 ? "1 like" : likes === 0 ? "0 like" : `${likes} likes`}
         </Likes>
         <Comments
+          photoId={id}
           author={user}
           caption={caption}
           commentNumber={commentNumber}
