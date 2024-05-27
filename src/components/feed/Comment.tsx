@@ -5,6 +5,7 @@ import React from "react";
 import { gql, useMutation } from "@apollo/client";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import useUser from "../../hooks/useUser";
 
 const DELETE_COMMENT_MUTAION = gql`
   mutation DeleteComment($id: Int!) {
@@ -96,9 +97,12 @@ function Comment({ id, photoId, author, payload, isMine }: IComment) {
   const onDeleteClick = () => {
     deleteCommentMutation();
   };
+
   return (
     <CommentContainer>
-      <FatText>{author?.username}</FatText>
+      <Link to={`/users/${author?.username}`}>
+        <FatText>{author?.username}</FatText>
+      </Link>
       <CommentCaption>
         {payload?.split(" ").map((word, index) =>
           /#[\w|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]+/g.test(word) ? (

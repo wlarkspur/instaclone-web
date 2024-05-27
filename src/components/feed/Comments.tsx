@@ -4,6 +4,7 @@ import Comment, { CommentCaption } from "./Comment";
 import { useForm } from "react-hook-form";
 import { gql, useMutation } from "@apollo/client";
 import useUser from "../../hooks/useUser";
+import { Link } from "react-router-dom";
 
 const CREATE_COMMENT_MUTATION = gql`
   mutation CreateComment($photoId: Int!, $payload: String!) {
