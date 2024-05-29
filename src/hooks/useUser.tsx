@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import routes from "../screens/routes";
 
-const ME_QUERY = gql`
+export const ME_QUERY = gql`
   query me {
     me {
       id

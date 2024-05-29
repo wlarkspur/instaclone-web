@@ -1,14 +1,32 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";
 import { PHOTO_FRAGMENT } from "../fragments";
 import { styled } from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faHeart } from "@fortawesome/free-solid-svg-icons";
 import { FatText } from "../components/shared";
+import Button from "../components/auth/Button";
+import PageTitle from "../components/PageTitle";
+import useUser, { ME_QUERY } from "../hooks/useUser";
 
 interface IProfileParams {
   username: string;
 }
+
+const FOLLOW_USER_MUTATION = gql`
+  mutation followUser($username: String!) {
+    followUser(username: $username) {
+      ok
+    }
+  }
+`;
+const UNFOLLOW_USER_MUTATION = gql`
+  mutation unfollowUser($username: String!) {
+    unfollowUser(username: $username) {
+      ok
+    }
+  }
+`;
 
 const SEE_PROFILE_QUERY = gql`
   query seeProfile($username: String) {
@@ -49,6 +67,7 @@ const Username = styled.h3`
 const Row = styled.div`
   margin-bottom: 20px;
   font-size: 16px;
+  display: flex;
 `;
 const List = styled.ul`
   display: flex;
@@ -104,21 +123,120 @@ const Icon = styled.span`
     margin-right: 5px;
   }
 `;
+
+const ProfileBtn = styled(Button).attrs({
+  as: "span",
+})`
+  margin-left: 10px;
+  margin-top: 0;
+  cursor: pointer;
+`;
+
 function Profile() {
   const { username } = useParams<IProfileParams>();
-  const { data } = useQuery(SEE_PROFILE_QUERY, {
+  const { data: userData } = useUser();
+  const client = useApolloClient(); // cache에 접근하려면 Apoolo client를 이용할 수 있다.
+  const { data, loading } = useQuery(SEE_PROFILE_QUERY, {
     variables: {
       username,
     },
   });
-  console.log(data);
+  const unfollowUserUpdate = (cache: any, result: any) => {
+    const {
+      data: {
+        unfollowUser: { ok },
+      },
+    } = result;
+    if (!ok) {
+      return;
+    }
+    cache.modify({
+      id: `User:${username}`,
+      fields: {
+        isFollowing(prev: any) {
+          return false;
+        },
+        totalFollowers(prev: any) {
+          return prev - 1;
+        },
+      },
+    });
+    const { me } = userData;
+    cache.modify({
+      id: `User:${me?.username}`,
+      fields: {
+        totalFollowing(prev: any) {
+          return prev - 1;
+        },
+      },
+    });
+  };
+  const [unfollowUser] = useMutation(UNFOLLOW_USER_MUTATION, {
+    variables: {
+      username,
+    },
+    update: unfollowUserUpdate,
+  });
+
+  const followUserCompleted = (data: any) => {
+    const {
+      followUser: { ok },
+    } = data;
+    if (!ok) {
+      return;
+    }
+    const { cache } = client;
+    cache.modify({
+      id: `User:${username}`,
+      fields: {
+        isFollowing(prev: any) {
+          return true;
+        },
+        totalFollowers(prev: any) {
+          return prev + 1;
+        },
+      },
+    });
+    const { me } = userData;
+    cache.modify({
+      id: `User:${me?.username}`,
+      fields: {
+        totalFollowing(prev: any) {
+          return prev + 1;
+        },
+      },
+    });
+  };
+  const [followUser] = useMutation(FOLLOW_USER_MUTATION, {
+    variables: {
+      username,
+    },
+    onCompleted: followUserCompleted,
+  });
+  const getButton = (seeProfile: any) => {
+    const { isMe, isFollowing } = seeProfile;
+    if (isMe) {
+      return <ProfileBtn>Edit Profile</ProfileBtn>;
+    }
+    if (isFollowing) {
+      return <ProfileBtn onClick={() => unfollowUser()}>Unfollow</ProfileBtn>;
+    } else {
+      return <ProfileBtn onClick={() => followUser()}>Follow</ProfileBtn>;
+    }
+  };
   return (
     <>
+      <PageTitle
+        title={
+          loading ? "Loading..." : `${data?.seeProfile.username}'s Profile`
+        }
+      />
       <Header>
         <Avatar src={data?.seeProfile?.avatar} />
         <Column>
           <Row>
             <Username>{data?.seeProfile?.username}</Username>
+            <>{data?.seeProfile ? getButton(data.seeProfile) : null}</>
           </Row>
           <Row>
             <List>
